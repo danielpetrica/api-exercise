@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('base_models', function (Blueprint $table) {
-            $table->id();
+        Schema::create('accounts', function (Blueprint $table) {
+            $table->id('internal_id');
+            $table->string("id")->unique();
+            $table->json("json")->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('base_models');
+        Schema::dropIfExists('accounts');
     }
 };

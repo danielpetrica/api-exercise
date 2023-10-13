@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GenericStripeJob;
 use App\Jobs\AccountUpdatedJob;
 use App\Jobs\CustomerCreatedJob;
 use App\Jobs\CustomerDeletedJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\Payment_intentCreatedJob;
 
 class WebhookController extends Controller
 {
@@ -27,11 +29,20 @@ class WebhookController extends Controller
         // Handle the event
         match ($type) {
             //'account.updated' => AccountUpdatedJob::dispatch($body)->delay(now()->addSeconds(5)),
-          'account.updated' => AccountUpdatedJob::dispatch($body), // not the customer, it's external account like card and bank account
-          'customer.created' => CustomerCreatedJob::dispatch($body),
-          'customer.deleted' => CustomerDeletedJob::dispatch($body),
+            // Someone you pay out to from stripe
+            'account.updated' => AccountUpdatedJob::dispatch($body),
+            // Someone you receive a payment from
+            'customer.created' => CustomerCreatedJob::dispatch($body),
+            'customer.deleted' => CustomerDeletedJob::dispatch($body),
+            'payment_intent.created' => Payment_intentCreatedJob::dispatch($body)->delay(now()->addSeconds(10)),
+
+            default => GenericStripeJob::dispatch($body),
+
 
         };
+
+
+        return response(null, 201);
 
     }
 }

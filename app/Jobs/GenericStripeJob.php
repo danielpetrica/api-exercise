@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class GenericStripeJob implements ShouldQueue
+class GenericStripeJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -30,7 +30,7 @@ class GenericStripeJob implements ShouldQueue
      *
      * @var int
      */
-    public $uniqueFor = 3600;
+    public int $uniqueFor = 3600;
 
     /**
      * Get the unique ID for the job.
@@ -45,6 +45,6 @@ class GenericStripeJob implements ShouldQueue
      */
     public function handle(): void
     {
-        //
+
     }
 }

@@ -2,30 +2,30 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Exception;
+use App\Models\Customer;
+use App\Helpers\LogHelper;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
-class CustomerCreatedJob implements ShouldQueue
+class CustomerCreatedJob extends GenericStripeJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    /**
-     * Create a new job instance.
-     */
-    public function __construct()
-    {
-        //
-    }
-
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        //
+        try
+        {
+            Customer::create($this->object);
+        } catch ( Exception $e ) {
+            Log::error('AccountUpdatedJob failed', [
+                "exception" => LogHelper::format_to_array($e),
+                "object" => $this->object
+            ]);
+            // I throw the exception again so that the job is retried and marked as failed in the queue
+            throw $e;
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WebhookController;
 
 /**
  * File for webhook routes published under /api/webhook
@@ -10,4 +11,4 @@ use Illuminate\Support\Facades\Route;
  * As stripe lets you specify which event to receive on each endpoint we can either have single endpoints for each event or manage them all in one place
  * For now we will manage them all in one place.
  */
-Route::get('/stripe', \App\Http\Controllers\WebhookController::class);
+Route::get('/stripe', WebhookController::class);
