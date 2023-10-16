@@ -21,6 +21,7 @@ class GenericStripeJob implements ShouldQueue, ShouldBeUnique
     public function __construct(
         public array $event_payload
     ) {
+
         $this->object = $event_payload['data']['object'];
     }
 
@@ -37,7 +38,7 @@ class GenericStripeJob implements ShouldQueue, ShouldBeUnique
      */
     public function uniqueId(): string
     {
-        return $this->event_payload->id;
+        return $this->event_payload['id'];
     }
 
     /**

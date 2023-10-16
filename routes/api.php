@@ -18,5 +18,6 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// @todo Add stripe webhook checks as defined in exercise_text.md
 Route::prefix('webhook')->group(base_path('routes/webhook.php'));
 

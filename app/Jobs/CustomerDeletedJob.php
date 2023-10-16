@@ -13,10 +13,12 @@ class CustomerDeletedJob extends GenericStripeJob implements ShouldQueue
 
     /**
      * Execute the job.
+     * @throws Exception
      */
     public function handle(): void
     {
-        Try {
+
+        try {
             Customer::where('id', $this->object['id'])->delete();
             // @todo: probably related entities should be deleted too
         } catch ( Exception $e ) {

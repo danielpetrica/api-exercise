@@ -11,4 +11,4 @@ use App\Http\Controllers\WebhookController;
  * As stripe lets you specify which event to receive on each endpoint we can either have single endpoints for each event or manage them all in one place
  * For now we will manage them all in one place.
  */
-Route::get('/stripe', WebhookController::class);
+Route::post('/stripe', WebhookController::class)->name('stripe.webhook');

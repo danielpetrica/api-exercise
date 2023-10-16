@@ -10,4 +10,6 @@ class Account extends StripeBaseModel
        'json',
     ];
 
+
+
 }

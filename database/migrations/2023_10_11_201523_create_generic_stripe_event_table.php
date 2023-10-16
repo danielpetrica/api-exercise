@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string("type");
             // contains the customer object received in case further data needs to be used in the future
             $table->json("json")->nullable();
-            $table->datetimes("created");
+            $table->datetime("created");
             $table->timestamps();
             $table->softDeletes();
         });

@@ -17,7 +17,9 @@ class AccountUpdatedJob extends GenericStripeJob implements ShouldQueue
     {
         try
         {
-            Account::create($this->object);
+            $account =  Account::create($this->object);
+            $account->json = $this->object;
+            $account->save();
         } catch ( Exception $e ) {
             Log::error('AccountUpdatedJob failed', [
                 "exception" => LogHelper::format_to_array($e),

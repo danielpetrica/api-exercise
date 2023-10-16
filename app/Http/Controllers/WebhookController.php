@@ -18,7 +18,8 @@ class WebhookController extends Controller
     public function __invoke(Request $request)
     {
         // Get the type of event sent from stripe
-        $body = $request->json();
+        $body = $request->json()->all();
+
         if (!isset($body["type"])) {
             Log::error('Missing type', ["received_body" => $body]);
 
@@ -37,8 +38,6 @@ class WebhookController extends Controller
             'payment_intent.created' => Payment_intentCreatedJob::dispatch($body)->delay(now()->addSeconds(10)),
 
             default => GenericStripeJob::dispatch($body),
-
-
         };
 
 

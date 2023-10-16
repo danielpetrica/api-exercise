@@ -10,6 +10,10 @@ abstract class StripeBaseModel extends Model
 {
     use SoftDeletes, HasTimestamps;
 
+    protected $fillable = [
+        'id',
+        'json',
+    ];
     protected $primaryKey = "internal_id";
 
     protected $casts = [
