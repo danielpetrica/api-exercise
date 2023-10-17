@@ -1,14 +1,19 @@
 <?php
 
+use App\Jobs\CustomerDeletedJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\User;
+use function Pest\Laravel\expectsJobs;
+use Illuminate\Support\Facades\Queue;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class, );
 
 //beforeAll(function () {
 //    Artisan::call('migrate:fresh');
 //});
 it('checks Customer deleted job', function () {
+    Queue::fake();
     // let's create a customer
     $customer =  [
         "id" => "cus_9s6XKzkNRiz8i3",
@@ -50,6 +55,7 @@ it('checks Customer deleted job', function () {
     expect($customer->id)->toBe($customer['id']);
 
     $initialTime = time();
+
     // we receive the customer delete webhook
     $response = $this->postJson(route('stripe.webhook'), [
         'object'    => 'event',
@@ -67,11 +73,44 @@ it('checks Customer deleted job', function () {
 
     $finalTime = time();
 
-    expect($response->status())->toBe(201)
+    expect($response->status())
+        ->toBe(201)
         ->and($finalTime - $initialTime)
         ->toBeLessThan(2);
 
     // successful response from webhook
     // stripe needs a response within 2 seconds, better if less
 
-});
+})->refreshDatabase();
+
+it('It tests job enqueue', function() {
+    Queue::fake();
+
+    Queue::assertNothingPushed();
+
+    $event = ['id' => 'ev_01', 'data' => [
+                    'object' => [
+                        'id' => "cus_9s6XKzkNRiz8i3",
+                        "object" => "customer",
+                    ]
+                ]];
+    $job = Queue::push(CustomerDeletedJob::class, $event);
+
+    Queue::assertPushed(CustomerDeletedJob::class);
+
+} )->refreshDatabase();
+
+it(
+"it tests a job execution that should fail", function () {
+    $event = ['id' => 'ev_01', 'data' => [
+                        'object' => [
+                            'id' => "cus_9s6XKzkNRiz8i3",
+                            "object" => "customer",
+                        ]
+                    ]];
+    Queue::fake();
+
+    $job = new CustomerDeletedJob($event);
+
+    $job->handle();
+})->throws(Exception::class)->refreshDatabase();
