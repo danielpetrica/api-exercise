@@ -86,6 +86,28 @@ it("tests job enqueue",
      Queue::assertPushed(CustomerCreatedJob::class);
  }
 )->refreshDatabase();
+it("tests job processing",
+ function () use ($customer) {
+
+     $event = [
+         'object'    => 'event',
+         "id"        => 'ev_01',
+         "type"      => "customer.created",
+         "api_version" => "2019-12-03",
+         "created" => 1599750000,
+         'data' => [
+             'object' => $customer
+         ],
+     ];
+
+     \Pest\Laravel\assertDatabaseCount('customers', 0);
+     $job =  new CustomerCreatedJob($event);
+
+     $job->handle();
+     \Pest\Laravel\assertDatabaseCount('customers', 1);
+
+ }
+)->refreshDatabase();
 
 it("tests a job that should fail",
    function () use ($customer) {
