@@ -7,7 +7,7 @@ use App\Models\User;
 use function Pest\Laravel\expectsJobs;
 use Illuminate\Support\Facades\Queue;
 
-uses(RefreshDatabase::class, );
+uses(RefreshDatabase::class );
 
 //beforeAll(function () {
 //    Artisan::call('migrate:fresh');
@@ -88,12 +88,14 @@ it('It tests job enqueue', function() {
 
     Queue::assertNothingPushed();
 
-    $event = ['id' => 'ev_01', 'data' => [
-                    'object' => [
-                        'id' => "cus_9s6XKzkNRiz8i3",
-                        "object" => "customer",
-                    ]
-                ]];
+    $event = [
+        'id' => 'ev_01',
+        'data' => [
+            'object' => [
+                'id' => "cus_9s6XKzkNRiz8i3",
+                "object" => "customer",
+            ]
+        ]];
     $job = Queue::push(CustomerDeletedJob::class, $event);
 
     Queue::assertPushed(CustomerDeletedJob::class);
