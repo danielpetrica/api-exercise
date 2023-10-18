@@ -116,7 +116,6 @@ it("tests job processing",
      expect($model->address)->toBeArray();
      expect($model->shipping)->toBeArray();
      expect($model->payment_intents)->toBeEmpty();
-
  }
 )->refreshDatabase();
 
