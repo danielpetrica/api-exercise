@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string("id")->unique();
             $table->json("json")->nullable();
 
+            $table->string('customer')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

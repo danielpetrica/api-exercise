@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class );
 
-//beforeAll(function () {
-//    Artisan::call('migrate:fresh');
-//});
 it('checks Customer deleted job', function () {
     Queue::fake();
     // let's create a customer
@@ -102,8 +99,7 @@ it('It tests job enqueue', function() {
 
 } )->refreshDatabase();
 
-it(
-"it tests a job execution that should fail", function () {
+it("it tests a job execution that should fail", function () {
     $event = ['id' => 'ev_01', 'data' => [
                         'object' => [
                             'id' => "cus_9s6XKzkNRiz8i3",

@@ -25,6 +25,6 @@ class Customer extends StripeBaseModel
 
     function payment_intents (): HasMany
     {
-        return $this->hasMany(Payment_intent::class);
+        return $this->hasMany(Payment_intent::class, 'id','customer');
     }
 }

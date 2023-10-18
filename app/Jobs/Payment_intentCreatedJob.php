@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Payment_intent;
 use Mockery\Exception;
 use App\Models\Customer;
 use App\Helpers\LogHelper;
@@ -17,14 +18,26 @@ class Payment_intentCreatedJob extends GenericStripeJob {
     {
         try
         {
-            $customer = Customer::find($this->object['customer']);
-            if ($customer) {
-                $payment_intent = $customer->payment_intents()->create($this->object);
-                $payment_intent->json = $this->object;
-                $payment_intent->save();
-            } else {
+            try {
+                $customer = Customer::query()->where(
+                        'id',
+                        '=',
+                        $this->object['customer'])
+                    ->firstOrFail();
+            } catch (\Exception $e) {
                 throw new Exception('Payment_intentCreatedJob: Customer missing');
             }
+
+            $obj = $this->object;
+
+            $customer->unsetRelation('payment_intents');
+
+//            $customer->payment_intents()->create($obj);
+
+            $paymentIntentModel = Payment_intent::create($obj);
+            $paymentIntentModel->json = $obj;
+            $paymentIntentModel->save();
+
         } catch (Exception $e) {
             Log::error('Payment_intentCreatedJob failed', [
                 "exception" => LogHelper::format_to_array($e),
