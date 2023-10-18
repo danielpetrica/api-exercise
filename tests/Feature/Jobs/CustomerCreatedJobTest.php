@@ -8,7 +8,9 @@ uses(RefreshDatabase::class );
 $customer =  [
     "id" => "cus_9s6XKzkNRiz8i3",
     "object" => "customer",
-    "address" => null,
+    "address" => [
+        "test" => "test"
+    ],
     "balance" => -500,
     "created" => 1483565364,
     "currency" => "usd",
@@ -33,7 +35,9 @@ $customer =  [
     "phone" => null,
     "preferred_locales" => [
     ],
-    "shipping" => null,
+    "shipping" => [
+        "test" => "test"
+    ],
     "tax_exempt" => "none",
     "test_clock" => null
 ];
@@ -86,6 +90,7 @@ it("tests job enqueue",
      Queue::assertPushed(CustomerCreatedJob::class);
  }
 )->refreshDatabase();
+
 it("tests job processing",
  function () use ($customer) {
 
@@ -105,6 +110,12 @@ it("tests job processing",
 
      $job->handle();
      \Pest\Laravel\assertDatabaseCount('customers', 1);
+
+     $model = \App\Models\Customer::query()->where('id', '=', $customer['id'])->firstOrFail();
+
+     expect($model->address)->toBeArray();
+     expect($model->shipping)->toBeArray();
+     expect($model->payment_intents)->toBeEmpty();
 
  }
 )->refreshDatabase();
@@ -133,5 +144,4 @@ it("tests a job that should fail",
 
        $job->handle();
    }
-
 )->throws(Exception::class)->refreshDatabase();

@@ -7,6 +7,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertModelExists;
+
+
 $parsedArray = [
     "id" => "acct_1032D82eZvKYlo2C",
     "object" => "account",
@@ -365,6 +367,35 @@ it("check job enqueue", function () use ($parsedArray) {
     $job = Queue::push(AccountUpdatedJob::class, $event);
 
     Queue::assertPushed(AccountUpdatedJob::class);
+})->refreshDatabase();
+
+it("check job processing", function () use ($parsedArray) {
+    assertDatabaseEmpty('accounts' );
+    $account = Account::create($parsedArray);
+    //    $account->json = $parsedArray;
+    $account->save();
+
+    $event =  [
+        'object'    => 'event',
+        "id"        => 'ev_01',
+        "type"      => "account.updated",
+        "api_version" => "2019-12-03",
+        "created" => 1599750000,
+        'data' => [
+            'object' => $parsedArray
+        ],
+    ];
+
+    assertDatabaseCount('accounts' , 1);
+    $job = new AccountUpdatedJob($event);
+
+    assertDatabaseCount('accounts' , 1);
+    $job->handle();
+    $account =  Account::query()
+        ->where( 'id', '=', $parsedArray['id'])
+        ->firstOrFail();
+
+    expect($account->json)->toBeArray();
 })->refreshDatabase();
 
 it(" tests a job execution that should fail",

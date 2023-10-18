@@ -9,7 +9,4 @@ class Account extends StripeBaseModel
        'id',
        'json',
     ];
-
-
-
 }
